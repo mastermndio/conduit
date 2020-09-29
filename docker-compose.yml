@@ -1,31 +1,37 @@
-version: '3.1'
+version: '3'
 
 services:
 
   mongo:
-    image: mongo:3
+    image: mongo:latest
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    expose:
-      - "27017"
+      MONGO_INITDB_DATABASE: conduit
+      MONGO_INITDB_ROOT_USERNAME: admin-conduit
+      MONGO_INITDB_ROOT_PASSWORD: admin-password
     ports:
-      - "27017:27017"
+      - "27017-27019:27017-27019"
+    volumes:
+      - db-data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   frontend:
     build: ./frontend/
-    expose:
-      - "4100"
+    environment:
+      - REACT_APP_API_ROOT=http://192.168.1.44:3000/api # Cange the ip to machine ip
     ports:
       - "4100:4100"
 
 
   backend:
+    build: ./backend/
+    restart: always
+    environment:
+      - MONGODB_URI=mongodb://admin-conduit:admin-password@mongo:27017/conduit?authSource=admin&readPreference=primary&ssl=false
     depends_on:
       - mongo
-    build: ./backend/
-    environment:
-      - MONGODB_URI=mongodb://mongo/conduit
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data:
