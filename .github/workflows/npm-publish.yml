@@ -21,6 +21,6 @@ jobs:
       - run: |
           pwd
           ls -la
-          cd conduit/backend
+          cd backend
           npm install
           npm test
