@@ -34,9 +34,10 @@ jobs:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.${GITHUB_REF}_HOST }}
+        host: ${{ secrets.STAGING_HOST }}
         username: ubuntu
         key: ${{ secrets.KEY }}
         port: 22
         script: |
           echo "Youre logged in"
+        if: github.ref == 'refs/heads/staging'
